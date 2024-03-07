@@ -4,17 +4,19 @@
 // show todos in DOM -> create todo and show them
 
 // all todos saved in array
-const todos = [];
+let todos = [];
 
 //selectors
 const todoInput = document.querySelector(".to-do-input");
 const todoForm = document.querySelector(".form-container");
 const todoList = document.querySelector(".to-do");
 const todoFilter = document.querySelector(".filter-to-dos");
+// const todoRemoveBtn = document.querySelector(".trash");
 
 //every listners
 todoForm.addEventListener("submit", addNewTodo);
 todoFilter.addEventListener("change", filterTodos);
+// todoRemoveBtn.addEventListener("click", removeTodos)
 
 //functions
 function addNewTodo(e) {
@@ -67,18 +69,21 @@ function createTodos(todos) {
 
   todoList.innerHTML = result;
   todoInput.value = "";
+
+  // select remove btns
+  const todoRemoveBtn = document.querySelectorAll(".trash");
+  todoRemoveBtn.forEach((btn) => btn.addEventListener("click", removeTodos));
 }
 
 function filterTodos(e) {
   const filter = e.target.value;
 
-
   switch (filter) {
-    case "all": 
+    case "all":
       createTodos(todos);
       break;
-    
-    case "completed":{ 
+
+    case "completed": {
       const filteredTodos = todos.filter((t) => t.isCompleted);
       createTodos(filteredTodos);
       break;
@@ -95,5 +100,10 @@ function filterTodos(e) {
   }
 }
 
-//local
+function removeTodos(e) {
+  const todoId = +e.target.dataset.todoId;
+  todos = todos.filter((t) => t.id !== todoId);
+  createTodos(todos);
+}
 
+//local
