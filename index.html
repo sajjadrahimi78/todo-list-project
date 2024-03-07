@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To Do List</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./src/style/style.css" />
+  </head>
+
+  <body>
+    <header>
+      <h1>To Do List</h1>
+    </header>
+
+    <section class="main-container">
+      <div class="container">
+        <form action="" class="form-container">
+          <input type="text" class="to-do-input" />
+          <button class="to-do-button" type="submit">
+            <i class="material-icons">&#xe147;</i>
+          </button>
+        </form>
+        <div class="select">
+          <select name="to-dos" id="" class="filter-to-dos">
+            <option value="all" class="all">all</option>
+            <option value="completed" class="completed">completed</option>
+            <option value="uncompleted" class="uncompleted">uncompleted</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <div class="to-do-container">
+      <ul class="to-do">
+        <div class="todo">
+          <li>tesk 1</li>
+          <span>
+            <i style="font-size: 20px" class="far click">&#xf05d;</i>
+          </span>
+          <span>
+            <i style="font-size: 20px" class="far trash"> &#xf014;</i>
+          </span>
+        </div>
+      </ul>
+    </div>
+
+    <script src="./src/js/index.js"></script>
+  </body>
+</html>
