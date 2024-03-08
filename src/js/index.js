@@ -2,9 +2,12 @@
 // form -> submit => create a new todo {id , createdAt , titlt , isCompleted}
 // const todos = [] => todos.push(...)
 // show todos in DOM -> create todo and show them
+// filtr todos -> all completed and uncompleted
+// check and remove btns 
+// get and save todos in local storage
 
 // all todos saved in array
-let todos = [];
+// let todos = [];
 //create a global value for filter todos
 let filterValue = "all";
 
@@ -13,17 +16,20 @@ const todoInput = document.querySelector(".to-do-input");
 const todoForm = document.querySelector(".form-container");
 const todoList = document.querySelector(".to-do");
 const todoFilter = document.querySelector(".filter-to-dos");
-// const todoRemoveBtn = document.querySelector(".trash");
 
 //every listners
 todoForm.addEventListener("submit", addNewTodo);
 todoFilter.addEventListener("change", (e) => {
-    filterValue = e.target.value;
-    filterTodos()
+  filterValue = e.target.value;
+  filterTodos();
 });
-// todoRemoveBtn.addEventListener("click", removeTodos)
 
-//functions
+document.addEventListener("DOMContentLoaded", (e) => {
+  const todos = getAllTodos();
+  createTodos(todos);
+});
+
+//functions => web API
 function addNewTodo(e) {
   // stap refresh page (submitted type)
   e.preventDefault();
@@ -44,7 +50,8 @@ function addNewTodo(e) {
     isCompleted: false,
   };
 
-  todos.push(newTodo);
+  // todos.push(newTodo);
+  saveTodos(newTodo);
 
   filterTodos();
 }
@@ -85,6 +92,7 @@ function createTodos(todos) {
 }
 
 function filterTodos() {
+  const todos = getAllTodos();
 
   switch (filterValue) {
     case "all":
@@ -109,16 +117,33 @@ function filterTodos() {
 }
 
 function removeTodos(e) {
+  let todos = getAllTodos();
+
   const todoId = +e.target.dataset.todoId;
   todos = todos.filter((t) => t.id !== todoId);
+  localStorage.setItem("todos", JSON.stringify(todos));
   filterTodos();
 }
 
 function checkTodos(e) {
+  let todos = getAllTodos();
+
   const todoId = +e.target.dataset.todoId;
   const todo = todos.find((t) => t.id === todoId);
   todo.isCompleted = !todo.isCompleted;
+  localStorage.setItem("todos", JSON.stringify(todos));
   filterTodos();
 }
 
 //local
+function getAllTodos() {
+  const savedTodos = JSON.parse(localStorage.getItem("todos")) || [];
+  return savedTodos;
+}
+
+function saveTodos(todo) {
+  const savedTodos = getAllTodos();
+  savedTodos.push(todo);
+  localStorage.setItem("todos", JSON.stringify(savedTodos));
+  return savedTodos;
+}
