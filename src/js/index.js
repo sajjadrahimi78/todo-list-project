@@ -3,12 +3,13 @@
 // const todos = [] => todos.push(...)
 // show todos in DOM -> create todo and show them
 // filtr todos -> all completed and uncompleted
-// check and remove btns 
+// check and remove btns
 // get and save todos in local storage
 
 // all todos saved in array
 // let todos = [];
 //create a global value for filter todos
+
 let filterValue = "all";
 
 //selectors
@@ -16,6 +17,9 @@ const todoInput = document.querySelector(".to-do-input");
 const todoForm = document.querySelector(".form-container");
 const todoList = document.querySelector(".to-do");
 const todoFilter = document.querySelector(".filter-to-dos");
+const backdrop = document.querySelector(".backdrop");
+const modal = document.querySelector(".modal-edit");
+const inputFormModal = document.querySelector(".edit-form-container");
 
 //every listners
 todoForm.addEventListener("submit", addNewTodo);
@@ -23,7 +27,7 @@ todoFilter.addEventListener("change", (e) => {
   filterValue = e.target.value;
   filterTodos();
 });
-
+backdrop.addEventListener("click", closeModal);
 document.addEventListener("DOMContentLoaded", (e) => {
   const todos = getAllTodos();
   createTodos(todos);
@@ -31,7 +35,6 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
 //functions => web API
 function addNewTodo(e) {
-  // stap refresh page (submitted type)
   e.preventDefault();
 
   // user should added todo
@@ -68,12 +71,9 @@ function createTodos(todos) {
             <p class="createdAt">${new Date(todo.createdAt).toLocaleDateString(
               "fa-IR"
             )}</p>
-            <i style="font-size: 20px" class="far click" data-todo-id=${
-              todo.id
-            } >&#xf05d;</i>
-            <i style="font-size: 20px" class="far trash" data-todo-id=${
-              todo.id
-            } > &#xf014;</i>
+            <i class="far edit" data-todo-id=${todo.id}>&#xf044;</i>
+            <i class="far click" data-todo-id=${todo.id} >&#xf05d;</i>
+            <i class="far trash" data-todo-id=${todo.id} > &#xf014;</i>
         </span>
     </li>
     `;
@@ -89,7 +89,30 @@ function createTodos(todos) {
   // select check btns
   const todoCheckBtn = document.querySelectorAll(".click");
   todoCheckBtn.forEach((btn) => btn.addEventListener("click", checkTodos));
+
+  // select edit btns
+  const todoEditBtn = document.querySelectorAll(".edit");
+  todoEditBtn.forEach((btn) => btn.addEventListener("click", openModal));
 }
+
+function createModalTodos() {
+  const todos = getAllTodos();
+  
+  const inputModal = document.createElement("div");
+  inputModal.innerHTML = `
+  <input type="text" class="to-do-input input-modal" name="" id="" data-todo-id=""/>
+  <button
+    class="to-do-button modal-edit-btn"
+    data-todo-id=""
+    type="submit"
+  >
+    <i class="material-icons fa">&#xf044;</i>
+  </button> 
+  `;
+  inputModal.classList.add("to-do-input");
+  inputFormModal.append(inputModal);
+}
+createModalTodos();
 
 function filterTodos() {
   const todos = getAllTodos();
@@ -120,8 +143,9 @@ function removeTodos(e) {
   let todos = getAllTodos();
 
   const todoId = +e.target.dataset.todoId;
+
   todos = todos.filter((t) => t.id !== todoId);
-  localStorage.setItem("todos", JSON.stringify(todos));
+  saveAllTodos(todos);
   filterTodos();
 }
 
@@ -131,8 +155,39 @@ function checkTodos(e) {
   const todoId = +e.target.dataset.todoId;
   const todo = todos.find((t) => t.id === todoId);
   todo.isCompleted = !todo.isCompleted;
-  localStorage.setItem("todos", JSON.stringify(todos));
+  saveAllTodos(todos);
   filterTodos();
+}
+
+function openModal(e, id) {
+  e.preventDefault();
+  backdrop.classList.remove("hidden");
+  modal.classList.remove("hidden");
+
+  let todos = getAllTodos();
+  const todoId = +e.target.dataset.todoId;
+  const todo = todos.find((t) => t.id === todoId);
+  inputFormModal.children[0].children[0].value = todo.title;
+  inputFormModal.children[0].children[1].addEventListener("click", editTodos);
+  inputFormModal.children[0].children[0].dataset.todoId = todoId;
+}
+
+function closeModal() {
+  backdrop.classList.add("hidden");
+  modal.classList.add("hidden");
+}
+
+function editTodos(e) {
+  e.preventDefault();
+  let todos = getAllTodos();
+  const todoId = +e.target.parentElement.previousElementSibling.dataset.todoId;
+  const todo = todos.find((t) => t.id === todoId);
+  const todoValue = e.target.parentElement.previousElementSibling.value;
+  todo.title = todoValue
+
+  saveAllTodos(todos);
+  filterTodos();
+  closeModal()
 }
 
 //local
@@ -146,4 +201,8 @@ function saveTodos(todo) {
   savedTodos.push(todo);
   localStorage.setItem("todos", JSON.stringify(savedTodos));
   return savedTodos;
+}
+
+function saveAllTodos(todos) {
+  localStorage.setItem("todos", JSON.stringify(todos));
 }
