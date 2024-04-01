@@ -1,16 +1,6 @@
-// how to do this project:
-// form -> submit => create a new todo {id , createdAt , titlt , isCompleted}
-// const todos = [] => todos.push(...)
-// show todos in DOM -> create todo and show them
-// filtr todos -> all completed and uncompleted
-// check and remove btns
-// get and save todos in local storage
-
-// all todos saved in array
-// let todos = [];
-//create a global value for filter todos
-
+// global variables
 let filterValue = "all";
+let todoEditId = null;
 
 //selectors
 const todoInput = document.querySelector(".to-do-input");
@@ -19,7 +9,8 @@ const todoList = document.querySelector(".to-do");
 const todoFilter = document.querySelector(".filter-to-dos");
 const backdrop = document.querySelector(".backdrop");
 const modal = document.querySelector(".modal-edit");
-const inputFormModal = document.querySelector(".edit-form-container");
+const modalInput = document.querySelector(".input-modal");
+const modalEditBtn = document.querySelector(".modal-edit-btn");
 
 //every listners
 todoForm.addEventListener("submit", addNewTodo);
@@ -28,6 +19,7 @@ todoFilter.addEventListener("change", (e) => {
   filterTodos();
 });
 backdrop.addEventListener("click", closeModal);
+modalEditBtn.addEventListener("click", editTodos);
 document.addEventListener("DOMContentLoaded", (e) => {
   const todos = getAllTodos();
   createTodos(todos);
@@ -71,7 +63,9 @@ function createTodos(todos) {
             <p class="createdAt">${new Date(todo.createdAt).toLocaleDateString(
               "fa-IR"
             )}</p>
-            <i class="far edit" data-todo-id=${todo.id}>&#xf044;</i>
+            <i class="far edit" onclick="openModal(event)" data-todo-id=${
+              todo.id
+            }>&#xf044;</i>
             <i class="far click" data-todo-id=${todo.id} >&#xf05d;</i>
             <i class="far trash" data-todo-id=${todo.id} > &#xf014;</i>
         </span>
@@ -90,29 +84,7 @@ function createTodos(todos) {
   const todoCheckBtn = document.querySelectorAll(".click");
   todoCheckBtn.forEach((btn) => btn.addEventListener("click", checkTodos));
 
-  // select edit btns
-  const todoEditBtn = document.querySelectorAll(".edit");
-  todoEditBtn.forEach((btn) => btn.addEventListener("click", openModal));
 }
-
-function createModalTodos() {
-  const todos = getAllTodos();
-  
-  const inputModal = document.createElement("div");
-  inputModal.innerHTML = `
-  <input type="text" class="to-do-input input-modal" name="" id="" data-todo-id=""/>
-  <button
-    class="to-do-button modal-edit-btn"
-    data-todo-id=""
-    type="submit"
-  >
-    <i class="material-icons fa">&#xf044;</i>
-  </button> 
-  `;
-  inputModal.classList.add("to-do-input");
-  inputFormModal.append(inputModal);
-}
-createModalTodos();
 
 function filterTodos() {
   const todos = getAllTodos();
@@ -159,17 +131,20 @@ function checkTodos(e) {
   filterTodos();
 }
 
-function openModal(e, id) {
+function findOneTodo(id) {
+  const todos = getAllTodos();
+  const todo = todos.find((t) => t.id === id);
+  return todo;
+}
+
+function openModal(e) {
   e.preventDefault();
   backdrop.classList.remove("hidden");
   modal.classList.remove("hidden");
 
-  let todos = getAllTodos();
-  const todoId = +e.target.dataset.todoId;
-  const todo = todos.find((t) => t.id === todoId);
-  inputFormModal.children[0].children[0].value = todo.title;
-  inputFormModal.children[0].children[1].addEventListener("click", editTodos);
-  inputFormModal.children[0].children[0].dataset.todoId = todoId;
+  todoEditId = +e.target.dataset.todoId;
+  const todo = findOneTodo(todoEditId);
+  modalInput.value = todo.title;
 }
 
 function closeModal() {
@@ -177,17 +152,13 @@ function closeModal() {
   modal.classList.add("hidden");
 }
 
-function editTodos(e) {
-  e.preventDefault();
-  let todos = getAllTodos();
-  const todoId = +e.target.parentElement.previousElementSibling.dataset.todoId;
-  const todo = todos.find((t) => t.id === todoId);
-  const todoValue = e.target.parentElement.previousElementSibling.value;
-  todo.title = todoValue
-
+function editTodos() {
+  const todos = getAllTodos();
+  const todo = todos.find((t) => t.id === todoEditId);
+  todo.title = modalInput.value.trim();
   saveAllTodos(todos);
   filterTodos();
-  closeModal()
+  closeModal();
 }
 
 //local
